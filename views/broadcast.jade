@@ -1,0 +1,7 @@
+extends layout
+block append js
+  script(src='/javascripts/broadcast.js')
+    
+block content
+  div(data-room= room, id='room')
+  h1= room

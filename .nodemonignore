@@ -1,0 +1,6 @@
+/vendor/*
+/public/*
+*.css
+*.wav
+.DS_Store
+.git
