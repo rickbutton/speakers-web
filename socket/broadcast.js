@@ -1,5 +1,4 @@
 var WebSocketServer = require('ws').Server;
-var lame = require('lame');
 var Hashtable;
 var rooms = {};
 var roomNameCache;
@@ -52,7 +51,6 @@ function handleBroadcast(ws, buffer) {
 
 function handleBroadcastSubscribe(ws, msg) {
   if (!(msg.room in rooms)) {
-    encoder = new lame.Encoder({channels: 2, bitDepth: 16, sampleRate: 44100});
     encoder.on('data', function(data) {
       for(var i = 0; i < rooms[msg.room].clients.length; i++) {
         if (typeof rooms[msg.room].clients[i] != 'undefined') {
