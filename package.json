@@ -10,7 +10,6 @@
     "jade": "*",
     "express-load": "*",
     "ws": "*",
-    "lame": "*",
     "hashtable": "*"
   }
 }
