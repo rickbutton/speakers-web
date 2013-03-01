@@ -11,7 +11,7 @@ $(document).ready(function() {
       event: 'broadcast',
       room: roomId
     }
-    ws.send(JSON.stringify(msg), {binary: false});
+    ws.send(JSON.stringify(msg));
   }
   ws.onclose = function() {
 
@@ -58,7 +58,7 @@ function onGotAudio(event) {
   left  = event.inputBuffer.getChannelData(0);
   right = event.inputBuffer.getChannelData(1);
   mixed = concat(left, right);
-  ws.send(mixed, {binary: true});
+  ws.send(mixed);
 }
 
 function concat(a, b) {
