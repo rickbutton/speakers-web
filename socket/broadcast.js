@@ -51,13 +51,13 @@ function handleBroadcast(ws, buffer) {
 
 function handleBroadcastSubscribe(ws, msg) {
   if (!(msg.room in rooms)) {
-    encoder.on('data', function(data) {
-      for(var i = 0; i < rooms[msg.room].clients.length; i++) {
-        if (typeof rooms[msg.room].clients[i] != 'undefined') {
-          rooms[msg.room].clients[i].send(data, {binary: true});
-        }
-      }
-    });
+    // encoder.on('data', function(data) {
+    //   for(var i = 0; i < rooms[msg.room].clients.length; i++) {
+    //     if (typeof rooms[msg.room].clients[i] != 'undefined') {
+    //       rooms[msg.room].clients[i].send(data, {binary: true});
+    //     }
+    //   }
+    // });
     rooms[msg.room] = {
       broadcaster: ws,
       clients: [],
