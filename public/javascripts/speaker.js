@@ -77,10 +77,11 @@ function recvClockSync(msg) {
 }
 
 var timeSpan = 0;
-var startTime = Date.now();
+var startTime;
 function setupAudio() {
   context = new webkitAudioContext();
   timeSpan = context.currentTime;
+  startTime = Date.now();
 
 }
 
@@ -105,7 +106,7 @@ function handleAudio(data) {
   queue.push({
     left: all,
     //right: right,
-    time: Math.abs(delta) / 1000
+    time: (Date.now() - t2 + context.currentTime + Math.abs(delta)) / 1000
   });
   playQueue();
 }
@@ -121,7 +122,7 @@ function playQueue() {
     //source.buffer.getChannelData(1).set(next.right);
     source.loop = false;
     source.start(next.time);
-    timeSpan += source.buffer.duration/4;
+    timeSpan += source.buffer.duration;
   }
 }
 
