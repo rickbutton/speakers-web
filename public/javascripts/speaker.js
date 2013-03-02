@@ -20,6 +20,7 @@ function setupSocket() {
       room: roomId
     }
     ws.send(JSON.stringify(msg));
+    sendClockSync(ws);
   }
   ws.onclose = function() {
 
@@ -40,9 +41,34 @@ function setupSocket() {
         if (msg.event == 'speaker.success') {
           setupAudio();
         }
+        if (msg.event == 'clock.sync') {
+          recvClockSync(msg);
+        }
       }
     }
   }
+}
+
+function sendClockSync(ws) {
+  t0 = new Date().getTime();
+  msg = {
+    event: 'clock.sync',
+    data: {
+      t0: t0
+    }
+  }
+  ws.send(JSON.stringify(msg));
+}
+
+function recvClockSync(msg) {
+  t3 = new Date().getTime();
+  
+  t0 = msg.data.t0;
+  t1 = msg.data.t1;
+  t2 = msg.data.t2;
+  
+  delta = ((t1 - t0) + (t2 - t3))/2;
+  console.log("calc delta, is: " + delta);
 }
 
 var timeSpan = 0;

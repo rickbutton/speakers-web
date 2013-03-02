@@ -28,10 +28,19 @@ function handleMessage(ws, e, flags) {
         handleBroadcastSubscribe(ws, msg);
       if (msg.event == 'speaker')
         handleSpeakerSubscribe(ws, msg);
+      if (msg.event == 'clock.sync') {
+        handleClockSync(ws, msg);
+      }
     } else {
       console.log("bad event: " + e);
     }
   }
+}
+
+function handleClockSync(ws, msg) {
+  msg.data.t1 = new Date().getTime();
+  msg.data.t2 = new Date().getTime();
+  ws.send(JSON.stringify(msg));
 }
 
 function handleBroadcast(ws, buffer) {
