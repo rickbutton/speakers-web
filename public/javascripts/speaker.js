@@ -120,7 +120,7 @@ function playQueue() {
     source.buffer.getChannelData(0).set(next.left);
     //source.buffer.getChannelData(1).set(next.right);
     source.loop = false;
-    source.start(next.time);
+    source.start(timeSpan + next.time);
     timeSpan += source.buffer.duration/4;
   }
 }
