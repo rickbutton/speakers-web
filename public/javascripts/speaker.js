@@ -65,6 +65,14 @@ function sendClockSync(ws) {
   ws.send(JSON.stringify(msg));
 }
 
+function sendLatencySync(ws, delta) {
+  msg = {
+    event: 'latency.sync',
+    data: delta
+  }
+  ws.send(JSON.stringify(msg));
+}
+
 function recvClockSync(msg) {
   t3 = Date.now();
   
@@ -111,6 +119,7 @@ function handleAudio(data) {
   
   delta = ((t1 - t0) + (t2 - t3)) / 2;
   t3 = Date.now();
+  //handleLatencySync(ws, delta);
   
   next = {
     left: all,
@@ -134,7 +143,7 @@ function playQueue(next) {
   source.loop = false;
   if (true) {
     s = (context.currentTime + delta/1000);
-    if (s < timeSpan*4) {
+    if (true || s > timeSpan*4) {
       console.log(s - timeSpan*4);
       source.start(s);
     } else {

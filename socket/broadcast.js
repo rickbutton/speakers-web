@@ -18,6 +18,7 @@ module.exports = function(app, server) {
   });
 }
 
+largestLatency = 0;
 function handleMessage(ws, e, flags) {
   if (flags.binary) {
     handleBroadcast(ws, e);
@@ -30,6 +31,8 @@ function handleMessage(ws, e, flags) {
         handleSpeakerSubscribe(ws, msg);
       if (msg.event == 'clock.sync') {
         handleClockSync(ws, msg);
+      if (msg.event == 'latency.sync') {
+      }
       }
     } else {
       console.log("bad event: " + e);

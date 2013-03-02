@@ -157,15 +157,15 @@ position: absolute;
 }
 #fft {
 position: relative;
-left: 25%;
+left: 20%;
 top: 40%;
--webkit-transform: rotateX(-30deg) rotateY(45deg);
+-webkit-transform: rotateX(-25deg) rotateY(45deg);
 }
 #fft2 {
 position: relative;
-right: 25%;
+right:20%;
 top: 40%;
--webkit-transform: rotateX(-30deg) rotateY(-45deg);
+-webkit-transform: rotateX(-25deg) rotateY(-45deg);
 }
 label {
 cursor: pointer;
