@@ -58,7 +58,19 @@ function onGotAudio(event) {
   left  = event.inputBuffer.getChannelData(0);
   right = event.inputBuffer.getChannelData(1);
   mixed = concat(left, right);
-  ws.send(mixed);
+  
+  
+  //compressed = Zee.compress(Array.prototype.slice.call(new Uint8Array(mixed.buffer)));
+  opts = {
+    compressionType: Zlib.Deflate.CompressionType.DYNAMIC
+  }
+  compressed = new Zlib.Deflate(new Uint8Array(mixed.buffer), opts).compress();
+  console.log(avg(mixed));
+  
+  //console.log(mixed.length + ":" + compressed.length);
+  //console.log(avg(compressed));
+  ws.send(compressed);
+  //ws.send(mixed);
 }
 
 function concat(a, b) {
@@ -69,12 +81,10 @@ function concat(a, b) {
   return r;
 }
 
-function interleave(a, b) {
-  c = new Float32Array(a.length + b.length);
-  for (var i = 0; i < a.length; i++) {
-    c[i*2] = a[i];
-    c[i*2+1] = b[i];
-  }
-  return c;
+function avg(a) {
+  sum = 0;
+  for (var i = 0; i < a.length; i++)
+    sum += a[i];
+  return sum / a.length;
 }
 

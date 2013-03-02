@@ -81,14 +81,19 @@ function setupAudio() {
 }
 
 function handleAudio(data) {
-  head = new Float64Array(data);
-  all = new Float32Array(data);
+  head = new Float64Array(data, 0, 1);
+  
+  audioBytes = new Uint8Array(data, 8);
 
+  i = new Zlib.Inflate(audioBytes);
+  all = new Float32Array(i.decompress().buffer);
+  
+  console.log(avg(new Float32Array(all.buffer)));
+  
   left = all.subarray(2, all.length/2 + 2);
   right = all.subarray(2 + all.length/2);
   
   var playTime = (Date.now() - head[0] - delta) / 1000 + 3;
-  console.log(playTime);
   
   source = context.createBufferSource();
   source.connect(context.destination);
@@ -99,6 +104,17 @@ function handleAudio(data) {
   source.start(timeSpan + playTime);
   timeSpan += source.buffer.duration;
 }
+
+function avg(a) {
+  sum = 0;
+  for (var i = 0; i < a.length; i++)
+    sum += a[i];
+  return sum / a.length;
+}
+
+setInterval(function() {
+  sendClockSync(ws);
+}, 1000);
 
 
 
