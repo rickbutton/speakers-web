@@ -105,7 +105,7 @@ function handleAudio(data) {
   queue.push({
     left: all,
     //right: right,
-    time: delta / 1000
+    time: Math.abs(delta) / 1000
   });
   playQueue();
 }
