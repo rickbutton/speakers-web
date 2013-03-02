@@ -47,13 +47,15 @@ function handleBroadcast(ws, buffer) {
   roomName = roomNameCache.get(ws);
   if (typeof roomName != 'undefined') {
     room = rooms[roomName];
-    nb = new Buffer(buffer.length + 8);
+    nb = new Buffer(buffer.length + 16);
     d = Date.now();
     nb.writeDoubleLE(d, 0);
-    buffer.copy(nb, 8);
-    console.log(d + ":" + nb.readFloatLE(8));
+    buffer.copy(nb, 16);
+    //console.log(d + ":" + nb.readFloatLE(8));
     for(var i = 0; i < rooms[roomName].clients.length; i++) {
       if (typeof rooms[roomName].clients[i] != 'undefined') {
+        nb.writeDoubleLE(Date.now(), 8);
+        console.log(nb.readUInt8(24));
         rooms[roomName].clients[i].send(nb, {binary: true});
       }
     }

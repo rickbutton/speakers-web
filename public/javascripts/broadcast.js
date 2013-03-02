@@ -40,7 +40,7 @@ function setupAudio() {
     
     context = new webkitAudioContext();
     
-    node = context.createScriptProcessor(16384, 2, 2);
+    node = context.createScriptProcessor(4096, 1, 1);
     node.connect(context.destination);
     
     mediaSS = context.createMediaStreamSource(stream);
@@ -55,23 +55,37 @@ function setupAudio() {
 }
 
 function onGotAudio(event) {
+  r = new Resampler(44100, 22050, 1, 2048, false);
   left  = event.inputBuffer.getChannelData(0);
-  right = event.inputBuffer.getChannelData(1);
-  mixed = concat(left, right);
+  
+  newLeft = r.resampler(left);
+    
+  
+  mixed = newLeft;
   
   
-  //compressed = Zee.compress(Array.prototype.slice.call(new Uint8Array(mixed.buffer)));
   opts = {
     compressionType: Zlib.Deflate.CompressionType.DYNAMIC
   }
   compressed = new Zlib.Deflate(new Uint8Array(mixed.buffer), opts).compress();
-  console.log(avg(mixed));
   
-  //console.log(mixed.length + ":" + compressed.length);
-  //console.log(avg(compressed));
-  ws.send(compressed);
-  //ws.send(mixed);
+  buf = compressed.buffer;
+  
+  container = new ArrayBuffer(8 + compressed.length);
+  a64 = new Float64Array(container, 0, 1);
+  a8 = new Uint8Array(container);
+  a8.set(compressed, 8);
+  console.log(compressed[0]);
+  t0 = Date.now();
+  a64[0] = t0;
+  
+  
+  
+  
+  ws.send(new Uint8Array(container));
 }
+
+
 
 function concat(a, b) {
   var l = a.length;

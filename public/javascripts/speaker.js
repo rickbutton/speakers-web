@@ -23,6 +23,9 @@ function setupSocket() {
     }
     ws.send(JSON.stringify(msg));
     sendClockSync(ws);
+    setInterval(function() {
+      sendClockSync(ws);
+    }, 100);
   }
   ws.onclose = function() {
 
@@ -70,39 +73,56 @@ function recvClockSync(msg) {
   t2 = msg.data.t2;
   
   delta = ((t1 - t0) + (t2 - t3))/2;
-  console.log("calc delta, is: " + delta);
+  //console.log("calc delta, is: " + delta);
 }
 
 var timeSpan = 0;
+var startTime = Date.now();
 function setupAudio() {
   context = new webkitAudioContext();
   timeSpan = context.currentTime;
 
 }
 
+
+queue = [];
 function handleAudio(data) {
-  head = new Float64Array(data, 0, 1);
+  head = new Float64Array(data, 0, 3);
+  audioBytes = new Uint8Array(data, 8 * 3);
   
-  audioBytes = new Uint8Array(data, 8);
+  t0 = head[2];
+  t1 = head[0];
+  t2 = head[1];
+  t3 = Date.now();
+  delta = ((t1 - t0) + (t2 - t3)) / 2;
 
   i = new Zlib.Inflate(audioBytes);
   all = new Float32Array(i.decompress().buffer);
-  
-  console.log(avg(new Float32Array(all.buffer)));
-  
-  left = all.subarray(2, all.length/2 + 2);
-  right = all.subarray(2 + all.length/2);
-  
-  var playTime = (Date.now() - head[0] - delta) / 1000 + 3;
-  
-  source = context.createBufferSource();
-  source.connect(context.destination);
-  source.buffer = context.createBuffer(2, left.length, 44100);
-  source.buffer.getChannelData(0).set(left);
-  source.buffer.getChannelData(1).set(right);
-  source.loop = false;
-  source.start(timeSpan + playTime);
-  timeSpan += source.buffer.duration;
+  //all = new Float32Array(data, 8);  
+  //left = all.subarray(2, all.length/2 + 2);
+  //right = all.subarray(2 + all.length/2);
+  console.log("delta" + delta);
+  queue.push({
+    left: all,
+    //right: right,
+    time: (t3 - Date.now() - delta) / 1000
+  });
+  playQueue();
+}
+
+function playQueue() {
+  if (queue.length > 0) {
+    next = queue.shift();
+    console.log(next.time);
+    source = context.createBufferSource();
+    source.connect(context.destination);
+    source.buffer = context.createBuffer(1, next.left.length, 22050);
+    source.buffer.getChannelData(0).set(next.left);
+    //source.buffer.getChannelData(1).set(next.right);
+    source.loop = false;
+    source.start(next.time);
+    timeSpan += source.buffer.duration/4;
+  }
 }
 
 function avg(a) {
@@ -111,10 +131,6 @@ function avg(a) {
     sum += a[i];
   return sum / a.length;
 }
-
-setInterval(function() {
-  sendClockSync(ws);
-}, 1000);
 
 
 
