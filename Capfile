@@ -10,6 +10,5 @@ default_run_options[:pty] = true
 set :use_sudo, false
 
 set :app_command, "app.js"
-set :app_environment, "PORT=80"
 
 role :app, "198.211.102.99"
