@@ -47,15 +47,18 @@ function handleBroadcast(ws, buffer) {
   roomName = roomNameCache.get(ws);
   if (typeof roomName != 'undefined') {
     room = rooms[roomName];
-    //room.encoder.write(buffer);
+    nb = new Buffer(buffer.length + 8);
+    d = Date.now();
+    nb.writeDoubleLE(d, 0);
+    buffer.copy(nb, 8);
+    console.log(d + ":" + nb.readFloatLE(8));
     for(var i = 0; i < rooms[roomName].clients.length; i++) {
       if (typeof rooms[roomName].clients[i] != 'undefined') {
-        rooms[roomName].clients[i].send(buffer, {binary: true});
+        rooms[roomName].clients[i].send(nb, {binary: true});
       }
     }
   }
 }
-
 
 
 function handleBroadcastSubscribe(ws, msg) {

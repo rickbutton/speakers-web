@@ -10,6 +10,8 @@ $(document).ready(function() {
   
 });
 
+var delta = 0;
+
 function setupSocket() {
   host = window.document.location.host.replace(/:.*/, '');
   ws = new WebSocket('ws://' + host + ':' + window.location.port);
@@ -61,7 +63,7 @@ function sendClockSync(ws) {
 }
 
 function recvClockSync(msg) {
-  t3 = new Date().getTime();
+  t3 = Date.now();
   
   t0 = msg.data.t0;
   t1 = msg.data.t1;
@@ -79,9 +81,14 @@ function setupAudio() {
 }
 
 function handleAudio(data) {
+  head = new Float64Array(data);
   all = new Float32Array(data);
-  left = all.subarray(0, all.length/2);
-  right = all.subarray(all.length/2);
+
+  left = all.subarray(2, all.length/2 + 2);
+  right = all.subarray(2 + all.length/2);
+  
+  var playTime = (Date.now() - head[0] - delta) / 1000 + 3;
+  console.log(playTime);
   
   source = context.createBufferSource();
   source.connect(context.destination);
@@ -89,7 +96,7 @@ function handleAudio(data) {
   source.buffer.getChannelData(0).set(left);
   source.buffer.getChannelData(1).set(right);
   source.loop = false;
-  source.start(timeSpan + 3);
+  source.start(timeSpan + playTime);
   timeSpan += source.buffer.duration;
 }
 
