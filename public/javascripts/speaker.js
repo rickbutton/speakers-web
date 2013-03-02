@@ -106,7 +106,7 @@ function handleAudio(data) {
   queue.push({
     left: all,
     //right: right,
-    time: (Date.now() - t2 + context.currentTime + Math.abs(delta)) / 1000
+    time: Math.abs((Date.now() - t2 + context.currentTime + Math.abs(delta)) / 1000)
   });
   playQueue();
 }
