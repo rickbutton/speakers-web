@@ -46,7 +46,7 @@ function setupAudio() {
     setupVis(analyser);
     
     
-    node = context.createScriptProcessor(4096, 1, 1);
+    node = context.createScriptProcessor(4096*4, 1, 1);
     node.connect(context.destination);
     
     mediaSS = context.createMediaStreamSource(stream);
@@ -62,10 +62,14 @@ function setupAudio() {
   });
 }
 
+timeSpan = 0;
 function onGotAudio(event) {
   
-  r = new Resampler(44100, 22050, 1, 2048, false);
+  r = new Resampler(44100, 22050, 1, 4096*2, false);
   left  = event.inputBuffer.getChannelData(0);
+  
+  timeSpan += left.length / 44100;
+  console.log(timeSpan);
   
   newLeft = r.resampler(left);
     
@@ -80,13 +84,13 @@ function onGotAudio(event) {
   
   buf = compressed.buffer;
   
-  container = new ArrayBuffer(8 + compressed.length);
-  a64 = new Float64Array(container, 0, 1);
+  container = new ArrayBuffer(16 + compressed.length);
+  a64 = new Float64Array(container, 0, 2);
   a8 = new Uint8Array(container);
-  a8.set(compressed, 8);
-  console.log(compressed[0]);
+  a8.set(compressed, 16);
   t0 = Date.now();
   a64[0] = t0;
+  a64[1] = timeSpan;
   
   
   

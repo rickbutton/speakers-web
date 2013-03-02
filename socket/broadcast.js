@@ -74,7 +74,7 @@ function handleBroadcastSubscribe(ws, msg) {
     // });
     rooms[msg.room] = {
       broadcaster: ws,
-      clients: [],
+      clients: []
     }
     roomNameCache.put(ws, msg.room);
     ws.send(JSON.stringify({

@@ -73,7 +73,7 @@ function recvClockSync(msg) {
   t2 = msg.data.t2;
   
   delta = ((t1 - t0) + (t2 - t3))/2;
-  console.log("calc delta, is: " + delta);
+  //console.log("calc delta, is: " + delta);
 }
 
 var timeSpan = 0;
@@ -91,22 +91,25 @@ function setupAudio() {
 
 
 queue = [];
+
+var timeSpanStart = -1;
+
 function handleAudio(data) {
-  head = new Float64Array(data, 0, 3);
-  audioBytes = new Uint8Array(data, 8 * 3);
+  head = new Float64Array(data, 0, 4);
+  audioBytes = new Uint8Array(data, 8 * 4);
   
   t0 = head[2];
   t1 = head[0];
   t2 = head[1];
   
-  
+  t = head[3];
+  if (timeSpanStart == -1)
+    timeSpanStart = t;
 
-  i = new Zlib.Inflate(audioBytes);
-
-  
+  i = new Zlib.Inflate(audioBytes);  
   all = new Float32Array(i.decompress().buffer);
   
-  //delta = ((t1 - t0) + (t2 - t3)) / 2;
+  delta = ((t1 - t0) + (t2 - t3)) / 2;
   t3 = Date.now();
   
   next = {
@@ -116,7 +119,8 @@ function handleAudio(data) {
     t1: t1,
     t2: t2,
     t3: t3,
-    delta: delta
+    delta: delta,
+    timeSpan: t
   };
   playQueue(next);
 }
@@ -128,10 +132,14 @@ function playQueue(next) {
   source.buffer.getChannelData(0).set(next.left);
   //source.buffer.getChannelData(1).set(next.right);
   source.loop = false;
-  if (t0 + Math.abs(delta) > Date.now()) {
-    s = timeSpan//Math.abs(Date.now() - t0) / 1000;
-    console.log(s) 
-    source.start(s);
+  if (true) {
+    s = (context.currentTime + delta/1000);
+    if (s < timeSpan*4) {
+      console.log(s - timeSpan*4);
+      source.start(s);
+    } else {
+      console.error("skipped");
+    }
   }
   else
     console.error("skipped packet");
