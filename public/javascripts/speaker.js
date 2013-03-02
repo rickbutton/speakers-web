@@ -129,7 +129,7 @@ function playQueue(next) {
   //source.buffer.getChannelData(1).set(next.right);
   source.loop = false;
   if (t0 + Math.abs(delta) > Date.now()) {
-    s = timeSpan + Math.abs(delta)/1000;//Math.abs(Date.now() - t0) / 1000;
+    s = timeSpan//Math.abs(Date.now() - t0) / 1000;
     console.log(s) 
     source.start(s);
   }
