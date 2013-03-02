@@ -82,6 +82,10 @@ function setupAudio() {
   context = new webkitAudioContext();
   timeSpan = context.currentTime;
   startTime = Date.now();
+  
+  analyser = context.createAnalyser();
+  analyser.connect(context.destination);
+  setupVis(analyser);
 
 }
 
@@ -116,7 +120,7 @@ function playQueue() {
     next = queue.shift();
     console.log(next.time);
     source = context.createBufferSource();
-    source.connect(context.destination);
+    source.connect(analyser);
     source.buffer = context.createBuffer(1, next.left.length, 22050);
     source.buffer.getChannelData(0).set(next.left);
     //source.buffer.getChannelData(1).set(next.right);
@@ -125,13 +129,4 @@ function playQueue() {
     timeSpan += source.buffer.duration;
   }
 }
-
-function avg(a) {
-  sum = 0;
-  for (var i = 0; i < a.length; i++)
-    sum += a[i];
-  return sum / a.length;
-}
-
-
 

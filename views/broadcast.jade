@@ -1,9 +1,24 @@
-extends layout
-block append js
-  script(src='/javascripts/broadcast.js')
-  script(src='/javascripts/zlib.js')
-  script(src='/javascripts/resampler.js')
-    
-block content
+!!! 5
+html
+  head
   div(data-room= room, id='room')
-  h1= room
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='chrome=1')
+    title Web Audio API createMediaSourceElement() Example
+    link(href='http://fonts.googleapis.com/css?family=Open+Sans:300', rel='stylesheet', type='text/css')
+    link(href='../common.css', rel='stylesheet', type='text/css')
+    block append js
+      script(src='http://code.jquery.com/jquery-1.9.1.min.js')
+      script(src='/javascripts/broadcast.js')
+      script(src='/javascripts/speaker-vis.js')
+      script(src='/javascripts/zlib.js') 
+      script(src='/javascripts/resampler.js')     
+  body
+   div#room-title= 'broadcasting: ' + room
+   section
+      div
+        canvas#fft.fft(width='512', height='200')
+        canvas#fft2.fft(width='512', height='200')
+      h2#current-time
+
+  

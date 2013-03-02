@@ -1,4 +1,5 @@
 var ws;
+var streamEnabled = false;
 
 $(document).ready(function() {
   
@@ -28,6 +29,8 @@ $(document).ready(function() {
     }
   }
   
+  $("#toggle").click(toggleStream);
+  
 });
 
 function setupAudio() {
@@ -39,13 +42,18 @@ function setupAudio() {
   navigator.getUserMedia({audio:true, video:false}, function(stream) {
     
     context = new webkitAudioContext();
+    analyser = context.createAnalyser();
+    setupVis(analyser);
+    
     
     node = context.createScriptProcessor(4096, 1, 1);
     node.connect(context.destination);
     
     mediaSS = context.createMediaStreamSource(stream);
-    mediaSS.connect(node);
-      
+    mediaSS.connect(analyser);
+    
+    analyser.connect(node);
+    
         
     node.onaudioprocess = onGotAudio;
     
@@ -55,6 +63,7 @@ function setupAudio() {
 }
 
 function onGotAudio(event) {
+  
   r = new Resampler(44100, 22050, 1, 2048, false);
   left  = event.inputBuffer.getChannelData(0);
   
@@ -85,20 +94,14 @@ function onGotAudio(event) {
   ws.send(new Uint8Array(container));
 }
 
-
-
-function concat(a, b) {
-  var l = a.length;
-  var r = new Float32Array(a.length + b.length);
-  r.set(a);
-  r.set(b, l);
-  return r;
+function toggleStream() {
+  streamEnabled = !streamEnabled;
+  if (streamEnabled) {
+    $("#toggle").text("Stop");
+    $("#status").text("Status: Started");
+  }
+  else {
+    $("#toggle").text("Start");
+    $("status").text("Status: Stopped");
+  }
 }
-
-function avg(a) {
-  sum = 0;
-  for (var i = 0; i < a.length; i++)
-    sum += a[i];
-  return sum / a.length;
-}
-
