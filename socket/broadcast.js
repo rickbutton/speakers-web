@@ -105,9 +105,11 @@ function handleUnsubscribe(ws) {
     if (typeof rooms[room] != 'undefined'  && rooms[room].broadcaster == ws) {
       delete rooms[room];
     } else {
-      for(var i = 0; i < rooms[room].clients.length; i++) {
-        if (rooms[room].clients[i] == ws) {
-          delete rooms[room].clients[i];
+      if (room in rooms) {
+        for(var i = 0; i < rooms[room].clients.length; i++) {
+          if (rooms[room].clients[i] == ws) {
+            delete rooms[room].clients[i];
+          }
         }
       }
     }
